@@ -27,8 +27,8 @@ def generate_launch_description():
     )
 
     model_arg = DeclareLaunchArgument(
-        'model', default_value='my_robot.urdf',
-        description='Name of the URDF description to load'
+    'model', default_value='my_robot.urdf',
+    description='Name of the URDF description to load'
     )
 
     # Define the path to your URDF or Xacro file
@@ -39,13 +39,11 @@ def generate_launch_description():
     ])
 
     world_launch = IncludeLaunchDescription(
-        PythonLaunchDescriptionSource(
-            os.path.join(pkg_erl1, 'launch', 'world.launch.py'),
-        ),
-        launch_arguments={
-        'world': LaunchConfiguration('world'),
-        }.items()
-    )
+    PythonLaunchDescriptionSource(
+        os.path.join(pkg_erl1, 'launch', 'world.launch.py'),
+    ),
+    launch_arguments={'world': LaunchConfiguration('world')}.items()
+    )   
 
     # Launch rviz
     rviz_node = Node(
@@ -139,7 +137,13 @@ def generate_launch_description():
             {'use_sim_time': True},
         ]
     )
-
+    
+    spawn_node = Node(
+    package='ros_gz_sim',
+    executable='create',
+    arguments=['-name', 'my_robot', '-topic', 'robot_description'],
+    output='screen'
+    )
 
 
     launchDescriptionObject = LaunchDescription()
@@ -155,5 +159,6 @@ def generate_launch_description():
     launchDescriptionObject.add_action(gz_bridge_node)
     launchDescriptionObject.add_action(gz_image_bridge_node)
     launchDescriptionObject.add_action(ekf_node)
+    launchDescriptionObject.add_action(spawn_node)
 
     return launchDescriptionObject
